@@ -3,3 +3,4 @@ dist
 __pycache__
 backend/static
 .claude
+.vercel
