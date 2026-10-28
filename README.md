@@ -2,7 +2,7 @@
 
 Web app for a day-ahead power buying desk: (1) shows the latest national wind forecast available at the day-ahead decision cut-off, (2) quantifies how accurate that forecast has been, for **January 2026 decisions** (delivery days 2 Jan – 1 Feb 2026). Data: Elexon BMRS only – `WINDFOR` (forecast) and `FUELHH` fuelType `WIND` (actual).
 
-**Live app:** _<add Heroku/Vercel URL here>_
+**Live app:** https://ywgyjgbi.vercel.app (Vercel)
 **AI disclosure:** built with Claude Code (Anthropic) assisting design, code and docs.
 
 ## What you get
@@ -16,14 +16,15 @@ Web app for a day-ahead power buying desk: (1) shows the latest national wind fo
 | `backend/fetch_data.py` | Downloads Elexon data to `snapshot.json` (already committed; Jan 2026 is history so it never changes) |
 | `backend/test_main.py` | Two checks: no look-ahead in forecast selection, accuracy endpoint sanity |
 | `frontend/` | React + Vite + Recharts (`src/App.jsx` is the whole UI) |
-| `Dockerfile`, `heroku.yml` | Multi-stage build (UI → Python image); Heroku container deploy |
+| `Dockerfile`, `heroku.yml` | Multi-stage build (UI → Python image); runs anywhere Docker runs (Heroku container stack supported) |
+| `vercel.json`, `api/index.py`, `requirements.txt` | Vercel deploy: static React build + FastAPI as a serverless function |
 
 ## Run
 Docker: `docker build -t gridbricks . && docker run -p 8000:8000 gridbricks` → http://localhost:8000
 
 Dev: `cd backend && pip install -r requirements.txt && uvicorn main:app --reload`, and in another shell `cd frontend && npm i && npm run dev` (proxies `/api`). Tests: `cd backend && python test_main.py`.
 
-Deploy (Heroku): `heroku create && heroku stack:set container && git push heroku main`.
+Deploy: the live app runs on Vercel (import the repo, preset "Other"). Alternatively Heroku: `heroku create && heroku stack:set container && git push heroku main`.
 
 ## Method (key assumptions)
 - **Decision-time forecast:** for each target hour, the latest WINDFOR forecast published at or before a cut-off (default 09:00 UTC = UK time in Jan) on the day before delivery. GB day-ahead auctions close around 09:20–09:50 UK. The cut-off is adjustable in the UI.
